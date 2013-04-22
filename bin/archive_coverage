@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010_000;
+use lib ( './lib' );
+use Devel::CoverX::Archive;
+use Devel::CoverX::Archive::Options qw(
+    parse_command_line
+);
+use Data::Dumper;$Data::Dumper::Indent=1;
+
+my $options = parse_command_line();
+my $self = Devel::CoverX::Archive->new($options);
+

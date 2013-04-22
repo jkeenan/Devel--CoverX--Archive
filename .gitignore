@@ -1,0 +1,12 @@
+# .gitignore for Devel-CoverX-Archive
+/MANIFEST.bak
+/Makefile
+/Makefile.old
+/Devel-CoverX-Archive-*.tar.gz
+/MYMETA.yml
+/META.yml
+/blib
+/pm_to_blib
+/cover_db/
+/MYMETA.json
+/META.json
