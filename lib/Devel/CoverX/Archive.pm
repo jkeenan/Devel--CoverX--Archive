@@ -2,13 +2,6 @@ package Devel::CoverX::Archive;
 use strict;
 our $VERSION = '0.01';
 
-sub new {
-    my ($class, $args) = @_;
-    my %data = ();
-
-    return bless \%data, $class;
-}
-
 =head1 NAME
 
 Devel::CoverX::Archive - Track improvements in test coverage
@@ -117,6 +110,40 @@ Perl 5 subversions from one monthly release to the next.
 TODO: Determine how this will work.  Perhaps the command-line option
 C<--benchmark>.
 
+=head1 METHODS
+
+=head2 C<new()>
+
+=over 4
+
+=item * Purpose
+
+Devel::CoverX::Archive constructor.  Processes and validates arguments collected from
+command-line program or elsewhere.
+
+=item * Arguments
+
+Takes single hash reference.
+
+    $self = Devel::CoverX::Archive->new(\%options);
+
+=item * Return Value
+
+Devel::CoverX::Archive object.
+
+=item * Comment
+
+=back
+
+=cut
+
+sub new {
+    my ($class, $args) = @_;
+    my %data = ();
+
+    return bless \%data, $class;
+}
+
 =head1 BUGS AND LIMITATIONS
 
 This code should be considered I<alpha>.  All interfaces are subject to change
@@ -145,9 +172,6 @@ LICENSE file included with this module.
 perl(1). Devel::Cover(3);
 
 =cut
-
-#################### main pod documentation end ###################
-
 
 1;
 
