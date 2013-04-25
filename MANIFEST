@@ -11,4 +11,9 @@ META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/000_options.t
 t/001_new.t
+t/testdata/Alpha-0.01/lib/Alpha.pm
+t/testdata/Alpha-0.01/Makefile.PL
+t/testdata/Alpha-0.01/MANIFEST
+t/testdata/Alpha-0.01/t/001_load.t
+t/testdata/setup.pm
 Todo

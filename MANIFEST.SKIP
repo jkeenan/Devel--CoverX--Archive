@@ -34,3 +34,4 @@ svndiff/
 MYMETA.yml$
 MYMETA.json$
 \.gitignore
+^t/testdata/Alpha-0.01/META.*
