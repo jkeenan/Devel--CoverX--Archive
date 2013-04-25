@@ -1,8 +1,4 @@
 MANIFEST
-README
-LICENSE
-Todo
-Changes
 Makefile.PL
 lib/Alpha.pm
 t/001_load.t
