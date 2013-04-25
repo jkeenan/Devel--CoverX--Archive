@@ -1,6 +1,7 @@
 package Devel::CoverX::Archive;
 use strict;
 our $VERSION = '0.01';
+use Carp;
 
 =head1 NAME
 
@@ -140,6 +141,19 @@ Devel::CoverX::Archive object.
 sub new {
     my ($class, $args) = @_;
     my %data = ();
+
+    $data{coverage_dir} = $args->{coverage_dir} || 'cover_db';
+    croak "Cannot locate '$data{coverage_dir}' directory"
+        unless (-d $data{coverage_dir});
+    my @dbs = glob("$data{coverage_dir}/cover*");
+    croak "Could not locate unique coverage database in $data{coverage_dir}"
+        unless @dbs == 1;
+
+    $data{archive_dir} = $args->{archive_dir} || 'archive';
+    unless (-d $data{archive_dir} ) {
+        mkdir $data{archive_dir}
+            or croak "Unable to create $data{archive_dir}";
+    }
 
     return bless \%data, $class;
 }

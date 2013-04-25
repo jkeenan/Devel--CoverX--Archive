@@ -16,6 +16,8 @@ sub parse_command_line {
         'benchmark',
         'help',
         'verbose!',
+        'coverage_dir',
+        'archive_dir',
     );
     usage("-") if defined $opts{help};    # see if the user asked for help
     $opts{help} = ''; # just to make -w shut-up.
@@ -24,7 +26,7 @@ sub parse_command_line {
 
 sub usage {
     die <<END_OF_USAGE;
-Usage:  $0 --benchmark --help --verbose
+Usage:  $0 --benchmark --help --verbose --cover_dir=cover_db --archive_dir=archive
 END_OF_USAGE
 }
 
