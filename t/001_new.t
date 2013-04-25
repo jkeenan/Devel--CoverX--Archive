@@ -1,11 +1,28 @@
 use strict;
 use warnings;
 use Test::More;
-use lib ( './lib' );
+use lib ( './t', './lib' );
 use Devel::CoverX::Archive;
 
-my $self = Devel::CoverX::Archive->new ();
-isa_ok ($self, 'Devel::CoverX::Archive');
+use IO::CaptureOutput qw(capture);
+
+use testdata::setup qw(
+    setup_testing_dir
+    run_cover_on_sample_files
+);
+
+#my $dt_str = '2012-02-20T18:20:00';
+
+my $tdir = setup_testing_dir();
+run_cover_on_sample_files($tdir);
+
+my $self;
+
+
+
+
+#$self = Devel::CoverX::Archive->new ();
+#isa_ok ($self, 'Devel::CoverX::Archive');
 
 
 done_testing;
