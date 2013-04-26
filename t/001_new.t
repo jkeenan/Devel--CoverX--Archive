@@ -9,12 +9,14 @@ use IO::CaptureOutput qw(capture);
 use testdata::setup qw(
     setup_testing_dir
     run_cover_on_sample_files
+    verify_cover_has_been_run
 );
 
 #my $dt_str = '2012-02-20T18:20:00';
 
 my $tdir = setup_testing_dir();
-run_cover_on_sample_files($tdir);
+my $udir = run_cover_on_sample_files($tdir);
+verify_cover_has_been_run($tdir);
 
 my $self;
 

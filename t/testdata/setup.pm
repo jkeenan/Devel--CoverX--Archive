@@ -6,6 +6,7 @@ our @ISA = ( 'Exporter' );
 our @EXPORT_OK = qw(
     setup_testing_dir
     run_cover_on_sample_files
+    verify_cover_has_been_run
 );
 use Carp;
 use Cwd;
@@ -42,8 +43,22 @@ sub run_cover_on_sample_files {
     system(qq{cover -report text > /dev/null})
         and croak "Unable to run cover";
     chdir $cwd;
+    return $cwd;
 }
 
+sub verify_cover_has_been_run {
+    my $tdir = shift;
+    ok(-d $tdir, "$tdir exists for testing");
+    my @dbs = glob("$tdir/cover*");
+    is(scalar(@dbs), 1, "1 cover.NN database found");
+    ok(-f "$tdir/cover_db/digests", "Found digests file");
+    ok(-d "$tdir/cover_db/runs", "Found runs directory");
+    ok(-d "$tdir/cover_db/structure", "Found structure directory");
+}
+
+1;
+
+__END__
 #use File::Temp qw(tempdir);
 #use Path::Class;
 #use File::Copy::Recursive qw(dircopy);
@@ -68,4 +83,3 @@ sub run_cover_on_sample_files {
 #    return $tempdir->subdir($run);
 #}
 
-1;
