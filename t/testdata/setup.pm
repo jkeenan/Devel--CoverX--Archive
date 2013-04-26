@@ -49,11 +49,12 @@ sub run_cover_on_sample_files {
 sub verify_cover_has_been_run {
     my $tdir = shift;
     ok(-d $tdir, "$tdir exists for testing");
-    my @dbs = glob("$tdir/cover*");
-    is(scalar(@dbs), 1, "1 cover.NN database found");
-    ok(-f "$tdir/cover_db/digests", "Found digests file");
-    ok(-d "$tdir/cover_db/runs", "Found runs directory");
-    ok(-d "$tdir/cover_db/structure", "Found structure directory");
+    my $cover_db_dir = "$tdir/cover_db";
+    ok(-d $cover_db_dir, "cover_db/ exists for testing");
+    ok(-f "$cover_db_dir/digests", "Found digests file");
+    ok(-d "$cover_db_dir/runs", "Found runs directory");
+    ok(-d "$cover_db_dir/structure", "Found structure directory");
+    return $cover_db_dir;
 }
 
 1;

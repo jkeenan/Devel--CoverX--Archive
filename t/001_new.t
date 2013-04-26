@@ -16,15 +16,14 @@ use testdata::setup qw(
 
 my $tdir = setup_testing_dir();
 my $udir = run_cover_on_sample_files($tdir);
-verify_cover_has_been_run($tdir);
+my $cover_db_dir = verify_cover_has_been_run($tdir);
 
 my $self;
 
-
-
-
-#$self = Devel::CoverX::Archive->new ();
-#isa_ok ($self, 'Devel::CoverX::Archive');
+$self = Devel::CoverX::Archive->new( {
+    coverage_dir =>$cover_db_dir,
+} );;
+isa_ok ($self, 'Devel::CoverX::Archive');
 
 
 done_testing;
