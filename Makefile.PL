@@ -11,5 +11,9 @@ WriteMakefile(
     PREREQ_PM    => {
                      'Test::Simple' => 0.98,
                      'IO::CaptureOutput' => 0,
+                     'Path::Class' => 0,
+                     'File::Copy::Recursive' => 0,
+                     'File::Path' => 0,
+                     'File::Temp' => 0,
                     },
 );
