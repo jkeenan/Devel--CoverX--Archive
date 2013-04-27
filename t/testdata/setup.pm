@@ -7,6 +7,7 @@ our @EXPORT_OK = qw(
     setup_testing_dir
     run_cover_on_sample_files
     verify_cover_has_been_run
+    touch
 );
 use Carp;
 use Cwd;
@@ -55,6 +56,14 @@ sub verify_cover_has_been_run {
     ok(-d "$cover_db_dir/runs", "Found runs directory");
     ok(-d "$cover_db_dir/structure", "Found structure directory");
     return $cover_db_dir;
+}
+
+sub touch {
+    my ($file, $content) = @_;
+    $content ||= '';
+    open my $F, '>', $file or croak "Unable to open $file for writing";
+    print $F "$content\n";
+    close $F or croak "Unable to close $file after writing";
 }
 
 1;

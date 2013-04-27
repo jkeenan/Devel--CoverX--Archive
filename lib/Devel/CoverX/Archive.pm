@@ -157,13 +157,23 @@ sub new {
             unless (-d "$data{coverage_dir}/$dir");
     }
 
-#    $data{archive_dir} = $args->{archive_dir} || 'archive';
-#    unless (-d $data{archive_dir} ) {
-#        mkdir $data{archive_dir}
-#            or croak "Unable to create $data{archive_dir}";
-#    }
+    $data{archive_dir} = $args->{archive_dir} || 'archive';
+    unless (-d $data{archive_dir} ) {
+        mkdir $data{archive_dir}
+            or croak "Unable to create $data{archive_dir}";
+    }
 
     return bless \%data, $class;
+}
+
+sub get_coverage_dir {
+    my $self = shift;
+    return $self->{coverage_dir};
+}
+
+sub get_archive_dir {
+    my $self = shift;
+    return $self->{archive_dir};
 }
 
 =head1 BUGS AND LIMITATIONS

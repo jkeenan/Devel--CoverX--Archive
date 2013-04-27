@@ -1,7 +1,7 @@
 # t/000_options.t
 use strict;
 use warnings;
-use Test::More;
+use Test::More (tests => 3);
 use lib ( './lib' );
 use Devel::CoverX::Archive::Options qw(
     parse_command_line
@@ -31,4 +31,3 @@ is( ref($opts), 'HASH',
     like($stderr, qr/$unk/, "Detected unknown option");
 }
 
-done_testing();
