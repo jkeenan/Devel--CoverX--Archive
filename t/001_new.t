@@ -14,15 +14,26 @@ use testdata::setup qw(
 
 #my $dt_str = '2012-02-20T18:20:00';
 
+my $self;
+{
+    local $@;
+    eval {
+        $self = Devel::CoverX::Archive->new( {
+            coverage_dir => 'foo',
+        } );
+    };
+    like($@, qr/Cannot locate 'foo' directory/,
+        "new(): Got expected error message for missing coverage directory ");
+}
+
 my $tdir = setup_testing_dir();
 my $udir = run_cover_on_sample_files($tdir);
 my $cover_db_dir = verify_cover_has_been_run($tdir);
 
-my $self;
 
 $self = Devel::CoverX::Archive->new( {
-    coverage_dir =>$cover_db_dir,
-} );;
+    coverage_dir => $cover_db_dir,
+} );
 isa_ok ($self, 'Devel::CoverX::Archive');
 
 

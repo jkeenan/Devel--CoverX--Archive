@@ -147,8 +147,6 @@ sub new {
     $data{coverage_dir} = $args->{coverage_dir} || "$cwd/cover_db";
     croak "Cannot locate '$data{coverage_dir}' directory"
         unless (-d $data{coverage_dir});
-#        my $content = `ls -l $data{coverage_dir}`;
-#        say STDERR $content;
     my @dbs = glob("$data{coverage_dir}/cover*");
     croak "Could not locate unique coverage database in $data{coverage_dir}"
         unless @dbs == 1;
