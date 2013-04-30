@@ -3,6 +3,8 @@ use strict;
 our $VERSION = '0.01';
 use Carp;
 use Cwd;
+use Devel::Cover::DB;
+use DateTime;
 
 =head1 NAME
 
@@ -147,15 +149,17 @@ sub new {
     $data{coverage_dir} = $args->{coverage_dir} || "$cwd/cover_db";
     croak "Cannot locate '$data{coverage_dir}' directory"
         unless (-d $data{coverage_dir});
-    my @dbs = glob("$data{coverage_dir}/cover*");
-    croak "Could not locate unique coverage database in $data{coverage_dir}"
-        unless @dbs == 1;
-    croak "Could not locate 'digests' file in $data{coverage_dir}"
-        unless (-f "$data{coverage_dir}/digests");
-    foreach my $dir ( 'runs', 'structure' ) {
-        croak "Could not locate '$dir' directory underneath $data{coverage_dir}"
-            unless (-d "$data{coverage_dir}/$dir");
-    }
+
+    # This is an imperfect test of the validity of a Devel::Cover database,
+    # acknowledged as such in docs.  It tests for the presence of certain
+    # directories and files but not their intrinsic Devel::Cover-ness.
+    my $db = Devel::Cover::DB->new( db => $data{coverage_dir} );
+    croak "'$data{coverage_dir}' does not appear to hold a valid Devel::Cover database"
+        unless $db->is_valid();
+
+#    my @runs = $db->runs;
+#    $data{runtime_epoch} = int($runs[0]->{start});
+#    $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
 
     $data{archive_dir} = $args->{archive_dir} || 'archive';
     unless (-d $data{archive_dir} ) {
@@ -175,6 +179,17 @@ sub get_archive_dir {
     my $self = shift;
     return $self->{archive_dir};
 }
+
+sub get_runtime_epoch {
+    my $self = shift;
+    return $self->{runtime_epoch};
+}
+
+sub get_runtime_dt {
+    my $self = shift;
+    return $self->{runtime_dt};
+}
+
 
 =head1 BUGS AND LIMITATIONS
 

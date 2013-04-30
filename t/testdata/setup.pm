@@ -5,6 +5,7 @@ use 5.010;
 our @ISA = ( 'Exporter' );
 our @EXPORT_OK = qw(
     setup_testing_dir
+    run_devel_cover
     run_cover_on_sample_files
     verify_cover_has_been_run
     touch
@@ -34,17 +35,25 @@ sub setup_testing_dir {
     return $tdir;
 }
 
-sub run_cover_on_sample_files {
+sub run_devel_cover {
     my $tdir = shift;
     my $cwd = cwd();
     chdir $tdir or croak "Unable to change to tempdir";
     local $ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
     system(qq{$^X Makefile.PL && make && make test})
         and croak "Unable to run make and make test";
+    chdir $cwd or croak "Unable to change directory";;
+    return 1;
+}
+
+sub run_cover_on_sample_files {
+    my $tdir = shift;
+    my $cwd = cwd();
+    chdir $tdir or croak "Unable to change to tempdir";
     system(qq{cover -report text > /dev/null})
         and croak "Unable to run cover";
-    chdir $cwd;
-    return $cwd;
+    chdir $cwd or croak "Unable to change directory";;
+    return 1;
 }
 
 sub verify_cover_has_been_run {
