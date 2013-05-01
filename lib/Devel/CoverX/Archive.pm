@@ -5,6 +5,7 @@ use Carp;
 use Cwd;
 use Devel::Cover::DB;
 use DateTime;
+use Data::Dumper; $Data::Dumper::Indent=1;
 
 =head1 NAME
 
@@ -157,9 +158,13 @@ sub new {
     croak "'$data{coverage_dir}' does not appear to hold a valid Devel::Cover database"
         unless $db->is_valid();
 
-#    my @runs = $db->runs;
-#    $data{runtime_epoch} = int($runs[0]->{start});
-#    $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
+    my @runs;
+    {
+        local $SIG{__WARN__} = \&_capture;
+        @runs = $db->runs;
+    }
+    $data{runtime_epoch} = int($runs[0]->{start});
+    $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
 
     $data{archive_dir} = $args->{archive_dir} || 'archive';
     unless (-d $data{archive_dir} ) {
@@ -178,6 +183,10 @@ sub get_coverage_dir {
 sub get_archive_dir {
     my $self = shift;
     return $self->{archive_dir};
+}
+
+sub _capture {
+    my $str = $_[0];
 }
 
 sub get_runtime_epoch {
