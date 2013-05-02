@@ -154,15 +154,14 @@ sub new {
     # This is an imperfect test of the validity of a Devel::Cover database,
     # acknowledged as such in docs.  It tests for the presence of certain
     # directories and files but not their intrinsic Devel::Cover-ness.
-    my $db = Devel::Cover::DB->new( db => $data{coverage_dir} );
+    my $db = Devel::Cover::DB->new(
+        db => $data{coverage_dir},
+        cover_valid => 1,
+    );
     croak "'$data{coverage_dir}' does not appear to hold a valid Devel::Cover database"
         unless $db->is_valid();
 
-    my @runs;
-    {
-        local $SIG{__WARN__} = \&_capture;
-        @runs = $db->runs;
-    }
+    my @runs = $db->runs;
     $data{runtime_epoch} = int($runs[0]->{start});
     $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
 
