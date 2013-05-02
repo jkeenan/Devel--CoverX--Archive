@@ -40,17 +40,15 @@ run_devel_cover($tdir);
 run_cover_on_sample_files($tdir);
 my $cover_db_dir = verify_cover_has_been_run($tdir);
 
-#say STDERR "tdir: ", $tdir;
-#say STDERR `ls -l "$tdir/blib/lib/auto/Alpha"`;
-#say STDERR `ls -l "$tdir/blib/lib/auto"`;
-#say STDERR "cover_db_dir: ", $cover_db_dir;
+# A valid Devel::CoverX::Archive object
+
 $self = Devel::CoverX::Archive->new( {
     coverage_dir => $cover_db_dir,
 } );
-#isa_ok ($self, 'Devel::CoverX::Archive');
-#is($self->{coverage_dir}, $cover_db_dir,
-#    "Got expected coverage directory");
-#is($self->{archive_dir}, 'archive',
-#    "Got expected archive directory");
+isa_ok ($self, 'Devel::CoverX::Archive');
+is($self->{coverage_dir}, $cover_db_dir,
+    "Got expected coverage directory");
+is($self->{archive_dir}, 'archive',
+    "Got expected archive directory");
 
 done_testing;
