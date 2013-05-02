@@ -18,6 +18,7 @@ sub parse_command_line {
         'verbose!',
         'coverage_dir',
         'archive_dir',
+        'diff_dir',
     );
     usage("-") if defined $opts{help};    # see if the user asked for help
     $opts{help} = ''; # just to make -w shut-up.

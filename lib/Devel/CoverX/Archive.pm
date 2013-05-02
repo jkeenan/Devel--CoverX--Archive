@@ -123,8 +123,10 @@ C<--benchmark>.
 
 =item * Purpose
 
-Devel::CoverX::Archive constructor.  Processes and validates arguments collected from
-command-line program or elsewhere.
+Devel::CoverX::Archive constructor.  Processes and validates arguments
+collected from command-line program or elsewhere.  Determines the state of the
+relevant directories after F<cover> has been run but before any archiving is
+done.
 
 =item * Arguments
 
@@ -165,12 +167,30 @@ sub new {
     $data{runtime_epoch} = int($runs[0]->{start});
     $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
 
-    $data{archive_dir} = $args->{archive_dir} || 'archive';
+    $data{archive_dir} = $args->{archive_dir} || "$cwd/archive";
     unless (-d $data{archive_dir} ) {
         mkdir $data{archive_dir}
             or croak "Unable to create $data{archive_dir}";
     }
 
+    # Identify archives already present underneath $data{archive_dir}.
+    # Determine whether there already exists a diff file or database.
+    my (@archives, $diff);
+    opendir my $DIR, $data{archive_dir}
+        or croak "Unable to open archive directory for reading";
+    $data{archives} = [
+        map { "$data{archive_dir}/$_" }
+            grep { -d $_ && ($_ ne '.') && ($_ ne '..') } readdir $DIR
+    ];
+    closedir $DIR or croak "Unable to close archive directory after reading";
+
+    $data{diff_dir} = $args->{diff_dir} || "$cwd/diff";
+    unless (-d $data{diff_dir} ) {
+        mkdir $data{diff_dir}
+            or croak "Unable to create $data{diff_dir}";
+    }
+
+say STDERR Dumper \%data;
     return bless \%data, $class;
 }
 
@@ -184,8 +204,22 @@ sub get_archive_dir {
     return $self->{archive_dir};
 }
 
-sub _capture {
-    my $str = $_[0];
+sub get_archives {
+    my $self = shift;
+    my $archive_dir = $self->get_archive_dir();
+    opendir my $DIR, $archive_dir
+        or croak "Unable to open archive directory for reading";
+    my $archives = [
+        map { "$archive_dir/$_" }
+            grep { -d $_ && ($_ ne '.') && ($_ ne '..') } readdir $DIR
+    ];
+    closedir $DIR or croak "Unable to close archive directory after reading";
+    return $archives;
+}
+
+sub get_diff_dir {
+    my $self = shift;
+    return $self->{diff_dir};
 }
 
 sub get_runtime_epoch {

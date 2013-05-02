@@ -44,11 +44,26 @@ my $cover_db_dir = verify_cover_has_been_run($tdir);
 
 $self = Devel::CoverX::Archive->new( {
     coverage_dir => $cover_db_dir,
+    archive_dir  => "$tdir/archive",
+    diff_dir     => "$tdir/diff",
 } );
 isa_ok ($self, 'Devel::CoverX::Archive');
-is($self->{coverage_dir}, $cover_db_dir,
-    "Got expected coverage directory");
-is($self->{archive_dir}, 'archive',
-    "Got expected archive directory");
+is($self->get_coverage_dir, $cover_db_dir,
+    "Got expected name for coverage directory");
+ok(-d $self->get_coverage_dir, "coverage directory exists");
+
+my ($exp_archive_dir, $exp_diff_dir);
+$exp_archive_dir = "$tdir/archive";
+is($self->get_archive_dir, $exp_archive_dir,
+    "Got expected name for archive directory");
+ok(-d $self->get_archive_dir, "archive directory exists");
+
+$exp_diff_dir = "$tdir/diff";
+is($self->get_diff_dir, $exp_diff_dir,
+    "Got expected name for diff directory");
+ok(-d $self->get_diff_dir, "diff directory exists");
+
+is_deeply($self->get_archives(), [],
+    "As expected at this point, no archives found");
 
 done_testing;
