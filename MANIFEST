@@ -11,6 +11,7 @@ META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/000-options.t
 t/001-new.t
+t/002-process-latest-cover.t
 t/testdata/Alpha-0.01/blib/arch/.exists
 t/testdata/Alpha-0.01/blib/arch/auto/Alpha/.exists
 t/testdata/Alpha-0.01/blib/bin/.exists

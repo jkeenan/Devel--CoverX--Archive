@@ -6,6 +6,11 @@ use Cwd;
 use Devel::Cover::DB;
 use DateTime;
 use Data::Dumper; $Data::Dumper::Indent=1;
+use File::Basename;
+use File::Copy;
+use File::Copy::Recursive qw(dircopy);
+use File::Path qw(make_path);
+use File::Spec;
 
 =head1 NAME
 
@@ -149,7 +154,8 @@ sub new {
     my %data = ();
 
     my $cwd = cwd();
-    $data{coverage_dir} = $args->{coverage_dir} || "$cwd/cover_db";
+    $data{coverage_dir} = $args->{coverage_dir} ||
+        File::Spec->catdir($cwd, 'cover_db');
     croak "Cannot locate '$data{coverage_dir}' directory"
         unless (-d $data{coverage_dir});
 
@@ -163,11 +169,32 @@ sub new {
     croak "'$data{coverage_dir}' does not appear to hold a valid Devel::Cover database"
         unless $db->is_valid();
 
+    $data{cdb} = File::Spec->catfile(
+        $data{coverage_dir},
+        'cover.13',
+    );
+    croak "Could not locate cover.13" unless (-f $data{cdb});
+
+    $data{digests} = File::Spec->catfile(
+        $data{coverage_dir},
+        'digests',
+    );
+    croak "Could not locate digests" unless (-f $data{digests});
+
+    $data{structure_dir} = File::Spec->catdir(
+        $data{coverage_dir},
+        'structure',
+    );
+    croak "Could not locate structure dir $data{structure_dir}"
+        unless (-d $data{structure_dir});
+
     my @runs = $db->runs;
     $data{runtime_epoch} = int($runs[0]->{start});
     $data{runtime_dt} = DateTime->from_epoch(epoch=>$data{runtime_epoch});
+    $data{runtime_iso8601} = $data{runtime_dt}->iso8601();
 
-    $data{archive_dir} = $args->{archive_dir} || "$cwd/archive";
+    $data{archive_dir} = $args->{archive_dir} ||
+        File::Spec->catdir($cwd, 'archive');
     unless (-d $data{archive_dir} ) {
         mkdir $data{archive_dir}
             or croak "Unable to create $data{archive_dir}";
@@ -179,20 +206,95 @@ sub new {
     opendir my $DIR, $data{archive_dir}
         or croak "Unable to open archive directory for reading";
     $data{archives} = [
-        map { "$data{archive_dir}/$_" }
+        map { File::Spec->catfile($data{archive_dir}, $_) }
             grep { -d $_ && ($_ ne '.') && ($_ ne '..') } readdir $DIR
     ];
     closedir $DIR or croak "Unable to close archive directory after reading";
 
-    $data{diff_dir} = $args->{diff_dir} || "$cwd/diff";
+    $data{diff_dir} = $args->{diff_dir} ||
+        File::Spec->catdir($cwd, 'diff');
     unless (-d $data{diff_dir} ) {
         mkdir $data{diff_dir}
             or croak "Unable to create $data{diff_dir}";
     }
 
-say STDERR Dumper \%data;
     return bless \%data, $class;
 }
+
+=head2 C<process_latest_cover()>
+
+=over 4
+
+=item * Purpose
+
+Copy the coverage database from the latest run into the archive directory and
+run F<cover> to generate the HTML output that will be publicly visible.
+
+=item * Arguments
+
+None.
+
+=item * Return Value
+
+Returns true value upon success.
+
+=item * Comment
+
+=back
+
+=cut
+
+=pod
+
+-rw-r--r--   1 jimk  wheel  1550 May  2 20:57 cover.13
+-rw-r--r--   1 jimk  wheel  8686 May  2 20:57 digests
+drwxr-xr-x   2 jimk  wheel    68 May  2 20:57 runs
+drwxr-xr-x   3 jimk  wheel   102 May  2 20:57 structure
+
+=cut
+
+sub process_latest_cover {
+    my $self = shift;
+    my $this_archive_dir = File::Spec->catdir(
+        $self->get_archive_dir(),
+        $self->get_runtime_iso8601(),
+    );
+    my $this_runs_dir = File::Spec->catdir(
+        $this_archive_dir,
+        'runs',
+    );
+    my $this_structure_dir = File::Spec->catdir(
+        $this_archive_dir,
+        'structure',
+    );
+    make_path(
+        $this_archive_dir,
+        $this_runs_dir,
+        $this_structure_dir,
+        { mode => 0755 }
+    ) or croak "Unable to make directories for latest archive";
+    my $base_cdb = basename($self->{cdb});
+    my $arch_cdb = File::Spec->catfile(
+        $self->get_archive_dir(),
+        $base_cdb,
+    );
+    copy($self->{cdb}, $arch_cdb)
+        or croak "Unable to copy $base_cdb";
+    my $base_digests = basename($self->{digests});
+    my $arch_digests = File::Spec->catfile(
+        $self->get_archive_dir(),
+        $base_digests,
+    );
+    copy($self->{digests}, $arch_digests)
+        or croak "Unable to copy $base_digests";
+    dircopy($self->{structure_dir}, $this_structure_dir)
+        or croak "Unable to copy structure dir";
+
+    return 1;
+}
+
+
+########## HELPER METHODS ##########
 
 sub get_coverage_dir {
     my $self = shift;
@@ -225,6 +327,11 @@ sub get_diff_dir {
 sub get_runtime_epoch {
     my $self = shift;
     return $self->{runtime_epoch};
+}
+
+sub get_runtime_iso8601 {
+    my $self = shift;
+    return $self->{runtime_iso8601};
 }
 
 sub get_runtime_dt {
@@ -264,3 +371,12 @@ perl(1). Devel::Cover(3);
 
 1;
 
+__END__
+#my $ls = `ls -al $data{coverage_dir}`; say STDERR $ls;
+#say STDERR Dumper \%data;
+my $cd = $self->get_coverage_dir();
+my $runs_dir = "$cd/runs";
+my $str_dir = "$cd/structure";
+my $ls = `ls -al $cd`; say STDERR $ls;
+my $r = `ls -al $runs_dir`;say STDERR "r: $r";
+my $s = `ls -al $str_dir`;say STDERR "s: $s";
